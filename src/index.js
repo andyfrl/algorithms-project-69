@@ -1,16 +1,20 @@
 export default function search(inputArray, stringToken) {
-	let res = [];
+	let result = [];
 	const regex = new RegExp('\\w+', 'g');
-	const stringTerm = stringToken.match(regex)[0];
+	const stringTerm = (stringToken.match(regex) || [])[0];
 
 	for (let i = 0; i < inputArray.length; i++) {
-		const curObj = inputArray[i];
-		const stringArray = curObj.text.match(regex);
+		const numberOfMatchingItems = inputArray[i].text
+			.match(regex)
+			.filter((el) => el === stringTerm).length;
 
-		if (stringArray.includes(stringTerm)) {
-			res.push(curObj.id);
+		if (numberOfMatchingItems) {
+			result.push({id: inputArray[i].id, relevance: numberOfMatchingItems});
 		}
 	}
 
-	return res;
+	return result
+		.sort((a, b) => b.relevance - a.relevance)
+		.map(({id}) => id);
+
 }
