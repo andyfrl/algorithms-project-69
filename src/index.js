@@ -1,9 +1,13 @@
-export default function search(inputArray, stringToFind) {
+export default function search(inputArray, stringToken) {
 	let res = [];
-	for (let i = 0; i < inputArray.length; i++) {
-		let curObj = inputArray[i];
+	const regex = new RegExp('\\w+', 'g');
+	const stringTerm = stringToken.match(regex)[0];
 
-		if (curObj.text.split(' ').includes(stringToFind)) {
+	for (let i = 0; i < inputArray.length; i++) {
+		const curObj = inputArray[i];
+		const stringArray = curObj.text.match(regex);
+
+		if (stringArray.includes(stringTerm)) {
 			res.push(curObj.id);
 		}
 	}
