@@ -1,43 +1,26 @@
 export default function search(inputArray, stringToken) {
 	const regex = /\w+/g;
 	const stringTerm = (stringToken.match(regex) || []);
+	let index = new Map(); // Map<string, Set()>
+	let result = new Set();
 
 	if (!inputArray.length || !stringTerm.length) return [];
 
-	let termHashMap = new Map();
-	stringTerm.forEach(element => termHashMap.set(element, 0));
-
-	const result = inputArray.map(({ id, text }) => {
-		let hasFullSetOfValues = true;
-		let wordSum = 0;
-
-		text.match(regex).forEach(matchingWord => {
-			if (termHashMap.has(matchingWord)) {
-				termHashMap.set(matchingWord, termHashMap.get(matchingWord) + 1);
-			}
-		});
-
-		termHashMap.forEach((value, key) => {
-			if (!value) hasFullSetOfValues = false;
-			wordSum += value;
-			termHashMap.set(key, 0);
-		});
+	inputArray.forEach(({ id, text }) => {
+		const matchingWords = text.match(regex);
 		
-		return {id, hasFullSetOfValues, wordSum};
-
+		matchingWords.forEach(word => {
+			if (!index.has(word)) index.set(word, new Set());
+			index.get(word).add(id);
+		});
 	});
 
-	// descending sort only
-	function comparator(a, b) {		
-		if (b.hasFullSetOfValues && !a.hasFullSetOfValues) return 1;
-		else if (a.hasFullSetOfValues === b.hasFullSetOfValues) {
-			return b.wordSum - a.wordSum;
-		} else {
-			return -1;
+	stringTerm.forEach((word) => {
+		let docIds = index.get(word);
+		if (docIds) {
+			docIds.forEach(element => result.add(element));
 		}
-	}
+	});
 		
-	return result
-		.sort(comparator)
-		.map(({id}) => id);
+	return Array.from(result);
 }

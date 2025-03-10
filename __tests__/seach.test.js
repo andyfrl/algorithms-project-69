@@ -12,10 +12,12 @@ const docs = [doc1, doc2, doc3];
 const pattern = {
 	oneWord: 'shoot',
 	multiWord: 'shoot at me',
+	multiWord2: 'shooter at me',
 };
 const expectedResult = {
-	oneWord: ['doc2', 'doc1', 'doc3'],
-	multiWord: ['doc2', 'doc1', 'doc3'],
+	oneWord: ['doc1', 'doc2'],
+	multiWord: ['doc1', 'doc2'],
+	multiWord2: ['doc3', 'doc2'],
 };
 
 test('searchEmpty', () => {
@@ -28,4 +30,8 @@ test('searchOneWord', () => {
 
 test('searchMultiWord', () => {
 	expect(search(docs, pattern.multiWord)).toStrictEqual(expectedResult.multiWord);
+});
+
+test('searchMultiWord2', () => {
+	expect(search(docs, pattern.multiWord2)).toStrictEqual(expectedResult.multiWord2);
 });
