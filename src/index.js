@@ -1,26 +1,43 @@
 export default function search(inputArray, stringToken) {
 	const regex = /\w+/g;
 	const stringTerm = (stringToken.match(regex) || []);
-	let index = new Map(); // Map<string, Set()>
-	let result = new Set();
+	let index = new Map();
+	let result = new Map();
 
 	if (!inputArray.length || !stringTerm.length) return [];
-
+	const docsCount = inputArray.length;
+	
 	inputArray.forEach(({ id, text }) => {
 		const matchingWords = text.match(regex);
-		
+		const totalWordCount = matchingWords.length;
+
+		const wordCount = {};
 		matchingWords.forEach(word => {
-			if (!index.has(word)) index.set(word, new Set());
-			index.get(word).add(id);
+			wordCount[word] = (wordCount[word] || 0) + 1;
 		});
+		
+		for (const [word, count] of Object.entries(wordCount)) {
+			const tf = count / totalWordCount;
+			if (!index.has(word)) index.set(word, new Map());
+			index.get(word).set(id, tf);
+		}
+
 	});
 
 	stringTerm.forEach((word) => {
-		let docIds = index.get(word);
+		const docIds = index.get(word);
+		const idf = docIds ? Math.log(docsCount / docIds.size) : 0;
 		if (docIds) {
-			docIds.forEach(element => result.add(element));
+			docIds.forEach((tf, id) => {
+				const tfIdf = tf * idf;
+				result.set(id, (result.get(id) || 0) + tfIdf);
+			});
 		}
+
 	});
+	
+	return Array.from(result)
+		.sort((a,b) => b[1] - a[1])
+		.map((el) => el[0]);
 		
-	return Array.from(result);
 }

@@ -15,8 +15,8 @@ const pattern = {
 	multiWord2: 'shooter at me',
 };
 const expectedResult = {
-	oneWord: ['doc1', 'doc2'],
-	multiWord: ['doc1', 'doc2'],
+	oneWord: ['doc2', 'doc1'],
+	multiWord: ['doc2', 'doc1'],
 	multiWord2: ['doc3', 'doc2'],
 };
 
