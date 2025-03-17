@@ -26,7 +26,7 @@ export default function search(inputArray, stringToken) {
 
 	stringTerm.forEach((word) => {
 		const docIds = index.get(word);
-		const idf = docIds ? Math.log(docsCount / docIds.size) : 0;
+		const idf = docIds ? Math.log2(1 + (docsCount - docIds.size + 1) / (docIds.size + 0.5)) : 0;
 		if (docIds) {
 			docIds.forEach((tf, id) => {
 				const tfIdf = tf * idf;
@@ -35,7 +35,6 @@ export default function search(inputArray, stringToken) {
 		}
 
 	});
-	
 	return Array.from(result)
 		.sort((a,b) => b[1] - a[1])
 		.map((el) => el[0]);
