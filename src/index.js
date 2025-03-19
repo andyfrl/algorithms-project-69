@@ -3,6 +3,7 @@ export default function search(inputArray, stringToken) {
 	const stringTerm = (stringToken.match(regex) || []);
 	let index = new Map();
 	let result = new Map();
+	let docWordCount = new Map();
 
 	if (!inputArray.length || !stringTerm.length) return [];
 	const docsCount = inputArray.length;
@@ -10,6 +11,7 @@ export default function search(inputArray, stringToken) {
 	inputArray.forEach(({ id, text }) => {
 		const matchingWords = text.match(regex);
 		const totalWordCount = matchingWords.length;
+		docWordCount.set(id, totalWordCount);
 
 		const wordCount = {};
 		matchingWords.forEach(word => {
@@ -21,22 +23,28 @@ export default function search(inputArray, stringToken) {
 			if (!index.has(word)) index.set(word, new Map());
 			index.get(word).set(id, tf);
 		}
-
 	});
 
+	const avgdl = Array.from(docWordCount.values())
+		.reduce((acc, cur) => {
+			return acc += cur;
+		});
+
 	stringTerm.forEach((word) => {
+		const K1 = 2.0;
+		const B = 0.75;
 		const docIds = index.get(word);
-		const idf = docIds ? Math.log2(1 + (docsCount - docIds.size + 1) / (docIds.size + 0.5)) : 0;
+		const idf = docIds ? Math.log10(1 + (docsCount - docIds.size + 1) / (docIds.size + 0.5)) : 0;
 		if (docIds) {
 			docIds.forEach((tf, id) => {
-				const tfIdf = tf * idf;
+				const tfIdf = idf * (tf * (K1 + 1)) / (tf + K1 * (1 - B + B * docWordCount.get(id) / avgdl));
 				result.set(id, (result.get(id) || 0) + tfIdf);
 			});
 		}
 
 	});
-	return Array.from(result)
-		.sort((a,b) => b[1] - a[1])
-		.map((el) => el[0]);
-		
+
+	return Array.from(result.entries())
+		.sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
+		.map(([id]) => id);
 }

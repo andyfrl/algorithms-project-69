@@ -56,3 +56,13 @@ test('simpleSearch', () => {
 
 	expect(result).toEqual(docIds);
 });
+
+test('search with spam, pretext', () => {
+	const searchText = 'the trash island is a';
+	const docIds = ['garbage_patch_NG', 'garbage_patch_ocean_clean', 'garbage_patch_wiki', 'garbage_patch_spam'];
+
+	const documentPaths = docIds.map(getDocumentText);
+	const result = search(documentPaths, searchText);
+
+	expect(result).toEqual(docIds);
+});
