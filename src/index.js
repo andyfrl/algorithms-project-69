@@ -24,20 +24,21 @@ export default function search(inputArray, stringToken) {
 			index.get(word).set(id, tf);
 		}
 	});
-
+	/*
 	const avgDocWordCount = Array.from(docWordCount.values())
 		.reduce((acc, cur) => {
 			return acc += cur;
 		}) / docsCount;
-
+		*/
 	stringTerm.forEach((word) => {
 		const K1 = 2.0;
 		const B = 0.75;
 		const docIds = index.get(word);
-		const idf = docIds ? Math.log10(1 + (docsCount - docIds.size + 1) / (docIds.size + 0.5)) : 0;
+		const idf = docIds ? Math.log2(1 + (docsCount - docIds.size + 1) / (docIds.size + 0.5)) : 0;
 		if (docIds) {
 			docIds.forEach((tf, id) => {
-				const tfIdf = idf * (tf * (K1 + 1)) / (tf + K1 * ((1 - B) + B * (docWordCount.get(id) / avgDocWordCount)));
+				//const tfIdf = idf * (tf * (K1 + 1)) / (tf + K1 * ((1 - B) + B * (docWordCount.get(id) / avgDocWordCount)));
+				const tfIdf = idf * tf;
 				result.set(id, (result.get(id) || 0) + tfIdf);
 			});
 		}
