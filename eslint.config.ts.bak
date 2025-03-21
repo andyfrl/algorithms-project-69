@@ -1,0 +1,16 @@
+module.exports = {
+  extends: 'airbnb-base',
+  plugins: ['import'],
+  env: {
+    es2021: true,
+    node: true,
+  },
+  parserOptions: {
+    ecmaVersion: 2020,
+  },
+  rules: {
+    // You can override or add rules here
+    'import/extensions': 'off', // Example of overriding a rule
+    'no-underscore-dangle': ['error', { allow: ['__filename', '__dirname'] }],
+  },
+};
